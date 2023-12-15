@@ -1,0 +1,14 @@
+{
+    "console-ninja.toolsToEnableSupportAutomaticallyFor": {
+        "serve": false,
+        "live-server-extension": true,
+        "live-preview-extension": true
+    },
+    "vscode_vibrancy.theme": "Default Dark",
+    "vscode_vibrancy.imports": [
+        "/path/to/file"
+    ],
+    "workbench.colorCustomizations": {
+        "titleBar.inactiveForeground": "#e7e7e799",
+    },
+}
