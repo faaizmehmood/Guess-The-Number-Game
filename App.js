@@ -1,76 +1,104 @@
-import { ImageBackground, SafeAreaView, StyleSheet } from "react-native";
-import StartGameScreen from "./screens/StartGameScreen";
-import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
-import GameScreen from "./screens/GameScreen";
-import Colors from "./constants/Colors";
-import GameOverScreen from "./screens/GameOverScreen";
+import { ActivityIndicator, ImageBackground, SafeAreaView, StyleSheet, View, Text } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
+import StartGameScreen from './src/screens/StartGameScreen'
+import { StatusBar } from 'expo-status-bar'
+import { LinearGradient } from 'expo-linear-gradient'
+import GameScreen from './src/screens/GameScreen'
+import { Color } from './src/utils/constants/Color'
+import GameOverScreen from './src/screens/GameOverScreen'
+import * as Font from 'expo-font'
 
 const App = () => {
-    const [userNumber, setUserNumber] = useState("");
-    const [isGameOver, setIsGameOver] = useState(true);
-    const [guessRounds, setGuessRounds] = useState(0);
+    const [userNumberPicked, setUserNumberPicked] = useState(null)
+    const [isGameOver, setIsGameOver] = useState(false)
+    const [fontsLoading, setFontsLoading] = useState(false)
+    const [numberOfRounds, setNumberOfRounds] = useState(0)
 
-    const pickNumberHandler = (enterrednumber) => {
-        setUserNumber(enterrednumber);
-        setIsGameOver(false);
-    };
+    const onPickNumberHandler = useCallback((numberPicked) => {
+        setUserNumberPicked(numberPicked)
+        setIsGameOver(false)
+    }, [userNumberPicked])
 
-    const gameOverHanler = (numberOfRounds) => {
-        setIsGameOver(true);
-        setGuessRounds(numberOfRounds);
-    };
+    const gameOverHandler = useCallback((countRounds) => {
+        setIsGameOver(true)
+        setNumberOfRounds(countRounds)
+    }, [isGameOver])
 
-    const startNewGameHandler = () => {
-        setUserNumber(null);
-        setGuessRounds(0);
-    };
+    const startNewGameHandler = useCallback(() => {
+        setIsGameOver(false)
+        setUserNumberPicked(null)
+    }, [userNumberPicked, isGameOver])
 
-    let screen = <StartGameScreen onPickNumber={pickNumberHandler} />;
+    useEffect(() => {
+        const loadFonts = async () => {
+            await Font.loadAsync({
+                'OpenSans-Bold': require('./assets/fonts/Open_Sans/OpenSans-Bold.ttf'),
+                'OpenSans-Regular': require('./assets/fonts/Open_Sans/OpenSans-Regular.ttf')
+            }).then((res) => {
+                setFontsLoading(true)
+            }).catch((err) => {
+                setFontsLoading(false)
+                console.log('err in loading fonts', err);
 
-    if (userNumber) {
-        screen = (
-            <GameScreen
-                userEnterredNumber={userNumber}
-                onGameOver={gameOverHanler}
-            />
-        );
-    }
+            });
+        }
+        loadFonts();
+    }, [])
 
-    if (isGameOver && userNumber) {
-        screen = (
-            <GameOverScreen
-                userEnterredNmbr={userNumber}
-                roundsNumber={guessRounds}
-                onStartNewGame={startNewGameHandler}
-            />
-        );
-    }
+    if (!fontsLoading) return (
+        <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading...</Text>
+            <ActivityIndicator size={30} color={Color.primary600} />
+        </View>
+    )
 
     return (
-        <LinearGradient
-            colors={[Colors.primary700, Colors.accent500]}
-            style={styles.rootScreen}
-        >
-            <ImageBackground
-                source={require("./assets/images/background.png")}
-                style={styles.rootScreen}
-                resizeMode="cover"
-                imageStyle={styles.imageBackground}
-            >
-                <SafeAreaView style={styles.rootScreen}>{screen}</SafeAreaView>
-            </ImageBackground>
-        </LinearGradient>
-    );
-};
+        <LinearGradient style={styles.rootScreen} colors={[Color.primary700, Color.accent500]}>
+            <StatusBar style='light' />
 
-export default App;
+            <ImageBackground
+                source={require('./assets/images/background.png')}
+                resizeMode='cover'
+                style={styles.rootScreen}
+                imageStyle={styles.imageOpacity}
+            >
+                <SafeAreaView style={styles.rootScreen}>
+
+                    {isGameOver ?
+                        <GameOverScreen roundsNumber={numberOfRounds} userNumber={userNumberPicked} startNewGameHandler={startNewGameHandler} />
+                        :
+                        userNumberPicked ?
+                            <GameScreen userNumber={userNumberPicked} gameOverHandler={gameOverHandler} />
+                            :
+                            <StartGameScreen onPickNumberHandler={onPickNumberHandler} />
+                    }
+
+                </SafeAreaView>
+
+            </ImageBackground>
+
+        </LinearGradient>
+    )
+}
+
+export default App
 
 const styles = StyleSheet.create({
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        margin: 5,
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: Color.accent500,
+    },
     rootScreen: {
         flex: 1,
     },
-    imageBackground: {
-        opacity: 0.18,
+    imageOpacity: {
+        opacity: 0.15
     },
-});
+})
