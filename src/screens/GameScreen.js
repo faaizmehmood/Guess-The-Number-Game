@@ -10,6 +10,7 @@ import { Color } from '../utils/constants/Color'
 import ShowGameRounds from '../components/game/ShowGameRounds'
 
 const generateRandomNumber = (min, max, exclude) => {
+
     let rndNumber = Math.floor(Math.random() * (max - min) + min)
     if (rndNumber === exclude) {
         return generateRandomNumber(min, max, exclude)
