@@ -1,7 +1,7 @@
 # Guess-The-Number-Game
 
 **About**
-I have made an Application called hasThe Game which simply asked user to enter the one or two numbers and then the app guess the closest number entered by the user in the certain rounds made by the user with a and also shows Alert to the user.
+I have made an Application called Guess The Game which simply asked user to enter the one or two numbers and then the app guess the closest number entered by the user in the certain rounds made by the user with a and also shows Alert to the user.
 
 **Images Preview**
 
